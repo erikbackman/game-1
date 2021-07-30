@@ -1,0 +1,6 @@
+cradle:
+  cabal:
+    - path: "./app/Main.hs"
+      component: "game1:exe:game1"
+    - path: "./lib"
+      component: "lib:game1"
