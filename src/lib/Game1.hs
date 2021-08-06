@@ -1,37 +1,32 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE BlockArguments             #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell            #-}
 
 module Game1 where
 
-import           Control.Concurrent             ( threadDelay )
-import           Control.Monad                  ( void )
-import           Control.Monad.Extra            ( whileM )
-import           Control.Monad.IO.Class         ( MonadIO )
-import           Control.Monad.Reader           ( MonadReader(..)
-                                                , ReaderT(ReaderT, runReaderT)
-                                                , asks
-                                                , reader
-                                                , runReader
-                                                )
-import           Control.Monad.State
-import           Data.Foldable                  ( foldl' )
-import           Data.Monoid                    ( Any(Any) )
-import           Data.Semigroup                 ( Sum(Sum) )
-import           Data.Text                      ( Text )
-import           Foreign.C                      ( CInt )
-import           Paths_game1
-import           SDL                            ( ($=)
-                                                , Point(P)
-                                                , Renderer
-                                                , V2(V2)
-                                                )
+import           Control.Concurrent     (threadDelay)
+import           Control.Lens           ((+=))
+import           Control.Monad          (void)
+import           Control.Monad.Extra    (whileM)
+import           Control.Monad.IO.Class (MonadIO)
+import           Control.Monad.Reader   (MonadReader (..),
+                                         ReaderT (ReaderT, runReaderT), asks,
+                                         reader, runReader)
+import           Control.Monad.State    (MonadIO (..), MonadState, StateT,
+                                         evalStateT, gets)
+import           Data.Foldable          (foldl')
+import           Data.Monoid            (Any (Any))
+import           Data.Semigroup         (Sum (Sum))
+import           Data.Text              (Text)
+import           Foreign.C              (CInt)
+import           Paths_game1            ()
+import           SDL                    (Point (P), Renderer, V2 (V2), ($=))
 
-import GameState
+import           Game1.GameState        (GameState (..), playerPos)
+import           Game1.Resources        (Resources (..), loadResources)
 
-import Control.Lens
 import qualified SDL
 import qualified SDL.Image
 
@@ -45,7 +40,7 @@ main = do
 
   renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
 
-  assets   <- loadAssets renderer
+  assets   <- loadResources renderer
 
   let
     env =
@@ -63,7 +58,6 @@ cleanupAndQuitSDL env = do
   SDL.destroyWindow $ env_window env
   SDL.quit
 
-
 startPosition :: Point V2 CInt
 startPosition = P $ V2 100 100
 
@@ -74,17 +68,11 @@ newtype Game1 a =
   Game1 (ReaderT Env (StateT GameState IO) a)
   deriving (Functor, Applicative, Monad, MonadReader Env, MonadState GameState, MonadIO)
 
-
-data Assets = Assets
-  { tex_box :: SDL.Texture
-  }
-
 data Env = Env
-  { env_assets   :: Assets
+  { env_assets   :: Resources
   , env_renderer :: SDL.Renderer
   , env_window   :: SDL.Window
   }
-
 
 data Intent
   = Quit
@@ -94,12 +82,6 @@ data Intent
 runGame1 :: Env -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
-loadAssets :: SDL.Renderer -> IO Assets
-loadAssets renderer = do
-  tex_box <- liftIO $ getDataFileName "assets/box.png" >>= loadTexture renderer
-  pure $ Assets { .. }
-  where
-    loadTexture renderer path = SDL.Image.loadTexture renderer path
 
 renderTexture
   :: MonadIO m => SDL.Renderer -> SDL.Texture -> (Point V2 CInt) -> m ()

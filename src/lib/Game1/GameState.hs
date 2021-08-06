@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module GameState
+module Game1.GameState
   (GameState(..), playerPos)
 where
 

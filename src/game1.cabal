@@ -15,7 +15,8 @@ library
   hs-source-dirs: lib
   exposed-modules:
     Game1
-    GameState
+    Game1.GameState
+    Game1.Resources
   other-modules: Paths_game1
   build-depends:
     base,
