@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Game1 where
 
@@ -27,6 +28,10 @@ import           SDL                            ( ($=)
                                                 , Renderer
                                                 , V2(V2)
                                                 )
+
+import GameState
+
+import Control.Lens
 import qualified SDL
 import qualified SDL.Image
 
@@ -46,7 +51,7 @@ main = do
     env =
       Env { env_assets = assets, env_renderer = renderer, env_window = window }
     initState =
-      GameState { playerPos = startPosition }
+      GameState { _playerPos = startPosition }
 
   runGame1 env initState mainLoop
   cleanupAndQuitSDL env
@@ -69,9 +74,6 @@ newtype Game1 a =
   Game1 (ReaderT Env (StateT GameState IO) a)
   deriving (Functor, Applicative, Monad, MonadReader Env, MonadState GameState, MonadIO)
 
-data GameState = GameState
-  { playerPos :: Point V2 CInt
-  }
 
 data Assets = Assets
   { tex_box :: SDL.Texture
@@ -82,6 +84,7 @@ data Env = Env
   , env_renderer :: SDL.Renderer
   , env_window   :: SDL.Window
   }
+
 
 data Intent
   = Quit
@@ -125,12 +128,10 @@ mainLoop = do
     case inputToIntent input of
       Quit       -> pure ()
       Idle       -> step r
-      Move delta -> do
-        modify (\s -> s { playerPos = playerPos s + P delta })
-        step r
+      Move delta -> playerPos += P delta >> step r
 
   step r' = do
-    p <- gets playerPos
+    p <- gets _playerPos
     SDL.clear r'
     renderPlayer p
     SDL.present r'
