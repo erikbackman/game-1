@@ -7,7 +7,7 @@
 module Game1 where
 
 import           Control.Concurrent     (threadDelay)
-import           Control.Lens           ((+=))
+import           Control.Lens           (withIndex, (+=))
 import           Control.Monad          (void)
 import           Control.Monad.Extra    (whileM)
 import           Control.Monad.IO.Class (MonadIO)
@@ -25,8 +25,9 @@ import           Paths_game1            ()
 import           SDL                    (Point (P), Renderer, V2 (V2), ($=))
 
 import           Game1.GameState        (GameState (..), playerPos)
-import           Game1.Resources        (Resources (..), loadResources)
 import           Game1.Input
+import           Game1.Resources        (Resources (..), destroyResources,
+                                         loadResources)
 
 import qualified SDL
 import qualified SDL.Image
@@ -35,47 +36,30 @@ main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
 
-  window <- SDL.createWindow
-    "Game1"
-    SDL.defaultWindow { SDL.windowInitialSize = V2 1280 720 }
+  withWindow \w -> do
+    resources <- loadResources w
 
-  renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
+    let
+      initState =
+        GameState { _playerPos = startPosition }
 
-  assets   <- loadResources renderer
+    runGame1 resources initState mainLoop
+    destroyResources resources
 
-  let
-    env =
-      Env { env_assets = assets, env_renderer = renderer, env_window = window }
-    initState =
-      GameState { _playerPos = startPosition }
-
-  runGame1 env initState mainLoop
-  cleanupAndQuitSDL env
-
-cleanupAndQuitSDL :: Env -> IO ()
-cleanupAndQuitSDL env = do
-  SDL.destroyTexture $ tex_box $ env_assets env
-  SDL.destroyRenderer $ env_renderer env
-  SDL.destroyWindow $ env_window env
-  SDL.quit
+withWindow :: MonadIO m => (SDL.Window -> m a) -> m ()
+withWindow f = do
+  w <- SDL.createWindow "Game1" SDL.defaultWindow { SDL.windowInitialSize = V2 1280 720 }
+  f w
+  SDL.destroyWindow w
 
 startPosition :: Point V2 CInt
 startPosition = P $ V2 100 100
 
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
-
-data Env = Env
-  { env_assets   :: Resources
-  , env_renderer :: SDL.Renderer
-  , env_window   :: SDL.Window
-  }
-
 newtype Game1 a =
-  Game1 (ReaderT Env (StateT GameState IO) a)
-  deriving (Functor, Applicative, Monad, MonadReader Env, MonadState GameState, MonadIO)
+  Game1 (ReaderT Resources (StateT GameState IO) a)
+  deriving (Functor, Applicative, Monad, MonadReader Resources, MonadState GameState, MonadIO)
 
-runGame1 :: Env -> GameState -> Game1 a -> IO a
+runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
 renderTexture
@@ -89,21 +73,21 @@ renderTexture renderer tex pos = do
 pollEventPayloads :: MonadIO m => m [SDL.EventPayload]
 pollEventPayloads = liftIO $ fmap SDL.eventPayload <$> SDL.pollEvents
 
-renderPlayer :: (MonadIO m, MonadReader Env m) => Point V2 CInt -> m ()
+renderPlayer :: (MonadIO m, MonadReader Resources m) => Point V2 CInt -> m ()
 renderPlayer pos = do
-  renderer <- asks env_renderer
-  image    <- asks (tex_box . env_assets)
+  renderer <- asks sdl_renderer
+  image    <- asks tex_box
   renderTexture renderer image pos
 
-mainLoop :: (MonadIO m, MonadReader Env m, MonadState GameState m) => m ()
+mainLoop :: (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
-  renderer <- asks env_renderer
+  renderer <- asks sdl_renderer
   loop renderer
  where
   loop r = do
     input <- pollEventPayloads
     case inputToIntent input of
-      Quit       -> pure ()
+      Quit       -> SDL.quit
       Idle       -> step r
       Move delta -> playerPos += P delta >> step r
 
