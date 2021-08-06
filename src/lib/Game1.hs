@@ -1,8 +1,5 @@
-{-# LANGUAGE BlockArguments             #-}
-{-# LANGUAGE DeriveFunctor              #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE BlockArguments     #-}
+{-# LANGUAGE DerivingStrategies #-}
 
 module Game1 where
 
@@ -26,7 +23,8 @@ import           SDL                    (Point (P), Renderer, V2 (V2), _x, _y,
 import           Game1.GameState        (GameState (..), playerPos)
 import           Game1.Input            (Intent (Idle, Move, Quit),
                                          inputToIntent, pollEventPayloads)
-import           Game1.Player           (nextPlayerPos, startPosition, renderPlayer)
+import           Game1.Player           (nextPlayerPos, renderPlayer,
+                                         startPosition)
 import           Game1.Resources        (Resources (..), destroyResources,
                                          loadResources)
 import           Game1.Window           (withWindow)
@@ -49,7 +47,7 @@ main = do
 
 newtype Game1 a =
   Game1 (ReaderT Resources (StateT GameState IO) a)
-  deriving (Functor, Applicative, Monad, MonadReader Resources, MonadState GameState, MonadIO)
+  deriving newtype (Functor, Applicative, Monad, MonadReader Resources, MonadState GameState, MonadIO)
 
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
