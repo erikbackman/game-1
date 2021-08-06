@@ -26,8 +26,7 @@ import           SDL                    (Point (P), Renderer, V2 (V2), _x, _y,
 import           Game1.GameState        (GameState (..), playerPos)
 import           Game1.Input            (Intent (Idle, Move, Quit),
                                          inputToIntent, pollEventPayloads)
-import           Game1.Player           (nextPlayerPos, startPosition)
-import           Game1.Render           (renderPlayer)
+import           Game1.Player           (nextPlayerPos, startPosition, renderPlayer)
 import           Game1.Resources        (Resources (..), destroyResources,
                                          loadResources)
 import           Game1.Window           (withWindow)

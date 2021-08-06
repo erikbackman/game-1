@@ -16,9 +16,3 @@ renderTexture renderer tex pos = do
   let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
       extent = V2 w h
   SDL.copy renderer tex Nothing (Just $ SDL.Rectangle pos extent)
-
-renderPlayer :: (MonadIO m, MonadReader Resources m) => Point V2 CInt -> m ()
-renderPlayer pos = do
-  renderer <- asks sdl_renderer
-  image    <- asks tex_box
-  renderTexture renderer image pos
