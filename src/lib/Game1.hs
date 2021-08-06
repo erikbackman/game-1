@@ -60,20 +60,18 @@ startPosition = P $ V2 100 100
 
 mainLoop :: (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
-  renderer <- asks sdl_renderer
-  loop renderer
- where
-  loop r = do
-    input <- pollEventPayloads
-    case inputToIntent input of
-      Quit       -> SDL.quit
-      Idle       -> step r
-      Move delta -> playerPos += P delta >> step r
+  input <- pollEventPayloads
+  case inputToIntent input of
+    Quit       -> SDL.quit
+    Idle       -> step
+    Move delta -> playerPos += P delta >> step
 
-  step r' = do
-    p <- gets _playerPos
-    SDL.clear r'
-    renderPlayer p
-    SDL.present r'
-    liftIO $ threadDelay (1000 * 16)
-    loop r'
+  where
+    step = do
+      r <- asks sdl_renderer
+      p <- gets _playerPos
+      SDL.clear r
+      renderPlayer p
+      SDL.present r
+      liftIO $ threadDelay (1000 * 16)
+      mainLoop

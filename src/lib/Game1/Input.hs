@@ -38,4 +38,4 @@ inputToIntent evps =
 
           otherwise -> mempty
   in
-    if quit then Quit else Move $ posDelta
+    if quit then Quit else Move posDelta
