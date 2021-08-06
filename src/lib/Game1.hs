@@ -7,9 +7,7 @@
 module Game1 where
 
 import           Control.Concurrent     (threadDelay)
-import           Control.Lens           (withIndex, (+=))
-import           Control.Monad          (void)
-import           Control.Monad.Extra    (whileM)
+import           Control.Lens           ((%=), (%~), (+=), (.=), (^.))
 import           Control.Monad.IO.Class (MonadIO)
 import           Control.Monad.Reader   (MonadReader (..),
                                          ReaderT (ReaderT, runReaderT), asks,
@@ -22,10 +20,13 @@ import           Data.Semigroup         (Sum (Sum))
 import           Data.Text              (Text)
 import           Foreign.C              (CInt)
 import           Paths_game1            ()
-import           SDL                    (Point (P), Renderer, V2 (V2), ($=))
+import           SDL                    (Point (P), Renderer, V2 (V2), _x, _y,
+                                         ($=))
 
 import           Game1.GameState        (GameState (..), playerPos)
-import           Game1.Input
+import           Game1.Input            (Intent (Idle, Move, Quit),
+                                         inputToIntent, pollEventPayloads)
+import           Game1.Player           (nextPlayerPos, startPosition)
 import           Game1.Render           (renderPlayer)
 import           Game1.Resources        (Resources (..), destroyResources,
                                          loadResources)
@@ -45,7 +46,7 @@ main = do
 
   where
     initState = GameState { _playerPos = startPosition }
-    windowConfig = SDL.defaultWindow { SDL.windowInitialSize = V2 1280 720 }
+    windowConfig = SDL.defaultWindow
 
 newtype Game1 a =
   Game1 (ReaderT Resources (StateT GameState IO) a)
@@ -54,16 +55,13 @@ newtype Game1 a =
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
-startPosition :: Point V2 CInt
-startPosition = P $ V2 100 100
-
 mainLoop :: (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
   input <- pollEventPayloads
   case inputToIntent input of
     Quit       -> SDL.quit
     Idle       -> step
-    Move delta -> playerPos += P delta >> step
+    Move delta -> playerPos %= nextPlayerPos delta >> step
 
   where
     step = do
