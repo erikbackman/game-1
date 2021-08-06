@@ -144,19 +144,21 @@ inputToIntent evps =
       flip foldMap
         evps
         \case
-          SDL.QuitEvent       -> (Any True, mempty)
-          SDL.KeyboardEvent e -> if
-            | SDL.keyboardEventKeyMotion e == SDL.Pressed
-            -> case SDL.keysymScancode (SDL.keyboardEventKeysym e) of
-              SDL.ScancodeQ -> (Any True, mempty)
-              SDL.ScancodeW -> (Any False, Sum (V2 0 (-10)))
-              SDL.ScancodeS -> (Any False, Sum (V2 0 10))
-              SDL.ScancodeA -> (Any False, Sum (V2 (-10) 0))
-              SDL.ScancodeD -> (Any False, Sum (V2 10 0))
-              _             -> mempty
-            | otherwise
-            -> mempty
-          _ -> mempty
+          SDL.QuitEvent -> (Any True, mempty)
+
+          SDL.KeyboardEvent e ->
+            if
+            | SDL.keyboardEventKeyMotion e == SDL.Pressed ->
+                case SDL.keysymScancode (SDL.keyboardEventKeysym e) of
+                  SDL.ScancodeQ -> (Any True, mempty)
+                  SDL.ScancodeW -> (Any False, Sum (V2 0 (-10)))
+                  SDL.ScancodeS -> (Any False, Sum (V2 0 10))
+                  SDL.ScancodeA -> (Any False, Sum (V2 (-10) 0))
+                  SDL.ScancodeD -> (Any False, Sum (V2 10 0))
+                  _             -> mempty
+            | otherwise -> mempty
+
+          otherwise -> mempty
   in
     if quit then Quit else Move $ posDelta
 
