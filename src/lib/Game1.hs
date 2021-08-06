@@ -26,6 +26,7 @@ import           SDL                    (Point (P), Renderer, V2 (V2), ($=))
 
 import           Game1.GameState        (GameState (..), playerPos)
 import           Game1.Resources        (Resources (..), loadResources)
+import           Game1.Input
 
 import qualified SDL
 import qualified SDL.Image
@@ -64,24 +65,18 @@ startPosition = P $ V2 100 100
 screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (640, 480)
 
-newtype Game1 a =
-  Game1 (ReaderT Env (StateT GameState IO) a)
-  deriving (Functor, Applicative, Monad, MonadReader Env, MonadState GameState, MonadIO)
-
 data Env = Env
   { env_assets   :: Resources
   , env_renderer :: SDL.Renderer
   , env_window   :: SDL.Window
   }
 
-data Intent
-  = Quit
-  | Idle
-  | Move (V2 CInt)
+newtype Game1 a =
+  Game1 (ReaderT Env (StateT GameState IO) a)
+  deriving (Functor, Applicative, Monad, MonadReader Env, MonadState GameState, MonadIO)
 
 runGame1 :: Env -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
-
 
 renderTexture
   :: MonadIO m => SDL.Renderer -> SDL.Texture -> (Point V2 CInt) -> m ()
@@ -119,29 +114,3 @@ mainLoop = do
     SDL.present r'
     liftIO $ threadDelay (1000 * 16)
     loop r'
-
-inputToIntent :: [SDL.EventPayload] -> Intent
-inputToIntent evps =
-  let
-    (Any quit, Sum posDelta) =
-      flip foldMap
-        evps
-        \case
-          SDL.QuitEvent -> (Any True, mempty)
-
-          SDL.KeyboardEvent e ->
-            if
-            | SDL.keyboardEventKeyMotion e == SDL.Pressed ->
-                case SDL.keysymScancode (SDL.keyboardEventKeysym e) of
-                  SDL.ScancodeQ -> (Any True, mempty)
-                  SDL.ScancodeW -> (Any False, Sum (V2 0 (-10)))
-                  SDL.ScancodeS -> (Any False, Sum (V2 0 10))
-                  SDL.ScancodeA -> (Any False, Sum (V2 (-10) 0))
-                  SDL.ScancodeD -> (Any False, Sum (V2 10 0))
-                  _             -> mempty
-            | otherwise -> mempty
-
-          otherwise -> mempty
-  in
-    if quit then Quit else Move $ posDelta
-
