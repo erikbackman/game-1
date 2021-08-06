@@ -14,7 +14,7 @@ data Resources = Resources
 loadResources :: SDL.Window -> IO Resources
 loadResources window = do
   sdl_renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
-  tex_box <- liftIO $ getDataFileName "assets/box.png" >>= loadTexture sdl_renderer
+  tex_box <- liftIO $ getDataFileName "assets/player.png" >>= loadTexture sdl_renderer
   pure $ Resources { .. }
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path
