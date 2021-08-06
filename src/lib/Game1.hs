@@ -26,8 +26,10 @@ import           SDL                    (Point (P), Renderer, V2 (V2), ($=))
 
 import           Game1.GameState        (GameState (..), playerPos)
 import           Game1.Input
+import           Game1.Render           (renderPlayer)
 import           Game1.Resources        (Resources (..), destroyResources,
                                          loadResources)
+import           Game1.Window           (withWindow)
 
 import qualified SDL
 import qualified SDL.Image
@@ -46,15 +48,6 @@ main = do
     runGame1 resources initState mainLoop
     destroyResources resources
 
-withWindow :: MonadIO m => (SDL.Window -> m a) -> m ()
-withWindow f = do
-  w <- SDL.createWindow "Game1" SDL.defaultWindow { SDL.windowInitialSize = V2 1280 720 }
-  f w
-  SDL.destroyWindow w
-
-startPosition :: Point V2 CInt
-startPosition = P $ V2 100 100
-
 newtype Game1 a =
   Game1 (ReaderT Resources (StateT GameState IO) a)
   deriving (Functor, Applicative, Monad, MonadReader Resources, MonadState GameState, MonadIO)
@@ -62,22 +55,8 @@ newtype Game1 a =
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
-renderTexture
-  :: MonadIO m => SDL.Renderer -> SDL.Texture -> (Point V2 CInt) -> m ()
-renderTexture renderer tex pos = do
-  ti <- SDL.queryTexture tex
-  let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
-      extent = V2 w h
-  SDL.copy renderer tex Nothing (Just $ SDL.Rectangle pos extent)
-
-pollEventPayloads :: MonadIO m => m [SDL.EventPayload]
-pollEventPayloads = liftIO $ fmap SDL.eventPayload <$> SDL.pollEvents
-
-renderPlayer :: (MonadIO m, MonadReader Resources m) => Point V2 CInt -> m ()
-renderPlayer pos = do
-  renderer <- asks sdl_renderer
-  image    <- asks tex_box
-  renderTexture renderer image pos
+startPosition :: Point V2 CInt
+startPosition = P $ V2 100 100
 
 mainLoop :: (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do

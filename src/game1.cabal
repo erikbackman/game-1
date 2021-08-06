@@ -18,6 +18,8 @@ library
     Game1.GameState
     Game1.Resources
     Game1.Input
+    Game1.Render
+    Game1.Window
   other-modules: Paths_game1
   build-depends:
     base,

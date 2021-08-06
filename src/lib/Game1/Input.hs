@@ -5,11 +5,15 @@ import qualified SDL
 import Data.Semigroup (Any(Any), Sum (Sum))
 import SDL
 import Foreign.C
+import Control.Monad.IO.Class (MonadIO (liftIO))
 
 data Intent
   = Quit
   | Idle
   | Move (V2 CInt)
+
+pollEventPayloads :: MonadIO m => m [SDL.EventPayload]
+pollEventPayloads = liftIO $ fmap SDL.eventPayload <$> SDL.pollEvents
 
 inputToIntent :: [SDL.EventPayload] -> Intent
 inputToIntent evps =
