@@ -38,15 +38,14 @@ main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
 
-  withWindow \w -> do
+  withWindow "Game1" windowConfig \w -> do
     resources <- loadResources w
-
-    let
-      initState =
-        GameState { _playerPos = startPosition }
-
     runGame1 resources initState mainLoop
     destroyResources resources
+
+  where
+    initState = GameState { _playerPos = startPosition }
+    windowConfig = SDL.defaultWindow { SDL.windowInitialSize = V2 1280 720 }
 
 newtype Game1 a =
   Game1 (ReaderT Resources (StateT GameState IO) a)
