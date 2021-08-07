@@ -20,6 +20,7 @@ library
     Game1.Player
     Game1.Render
     Game1.Resources
+    Game1.Scene
     Game1.Window
   other-modules: Paths_game1
   build-depends:

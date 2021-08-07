@@ -31,6 +31,7 @@ import           Game1.Window           (withWindow)
 
 import qualified SDL
 import qualified SDL.Image
+import Game1.Scene (drawScene)
 
 main :: IO ()
 main = do
@@ -63,9 +64,8 @@ mainLoop = do
   where
     step = do
       r <- asks sdl_renderer
-      p <- gets _playerPos
       SDL.clear r
-      renderPlayer p
+      drawScene
       SDL.present r
       liftIO $ threadDelay (1000 * 16)
       mainLoop

@@ -5,7 +5,7 @@ import           Control.Monad.Reader.Class (MonadReader, asks)
 import           Foreign.C                  (CInt)
 import           Game1.Render               (renderTexture)
 import           Game1.Resources            (Resources (Resources),
-                                             sdl_renderer, tex_box)
+                                             sdl_renderer, tex_player)
 import           Game1.Window               (withinBounds)
 import           SDL                        (Point (P), Renderer, V2 (V2), _x,
                                              _y, ($=))
@@ -20,5 +20,5 @@ nextPlayerPos delta current = let newPos = current + P delta
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Point V2 CInt -> m ()
 renderPlayer pos = do
   renderer <- asks sdl_renderer
-  image    <- asks tex_box
+  image    <- asks tex_player
   renderTexture renderer image pos

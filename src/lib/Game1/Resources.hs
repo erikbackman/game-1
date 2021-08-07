@@ -7,23 +7,30 @@ import qualified SDL
 import qualified SDL.Image
 
 data Resources = Resources
-  { tex_box      :: SDL.Texture
+  { tex_player   :: SDL.Texture
+  , tex_tile     :: SDL.Texture
   , sdl_renderer :: SDL.Renderer
   }
 
 loadResources :: SDL.Window -> IO Resources
 loadResources window = do
   sdl_renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
-  tex_box <- liftIO $ getDataFileName "assets/player.png" >>= loadTexture sdl_renderer
-  pure $ Resources { .. }
+  let loadAsset = loadAssetWithRenderer sdl_renderer
+  tex_player <- loadAsset "player.png"
+  tex_tile <- loadAsset "tile.png"
+  pure $ Resources {..}
+
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path
+    loadAssetWithRenderer r name = liftIO $ getDataFileName ("assets/" <> name) >>= loadTexture r
 
 destroyResources :: Resources -> IO ()
 destroyResources Resources
-  { tex_box
+  { tex_player
+  , tex_tile
   , sdl_renderer
   } = do
 
-  SDL.destroyTexture tex_box
+  SDL.destroyTexture tex_player
+  SDL.destroyTexture tex_tile
   SDL.destroyRenderer sdl_renderer
