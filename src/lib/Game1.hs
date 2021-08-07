@@ -4,39 +4,17 @@
 module Game1 where
 
 import           Control.Concurrent             ( threadDelay )
-import           Control.Lens                   ( (%=)
-                                                , (%~)
-                                                , (+=)
-                                                , (.=)
-                                                , (^.)
-                                                )
+import           Control.Lens                   ( (%=) )
 import           Control.Monad.IO.Class         ( MonadIO )
+import           Control.Monad.IO.Class         ( liftIO )
 import           Control.Monad.Reader           ( MonadReader(..)
                                                 , ReaderT(ReaderT, runReaderT)
                                                 , asks
-                                                , reader
-                                                , runReader
                                                 )
-import           Control.Monad.State            ( MonadIO(..)
-                                                , MonadState
+import           Control.Monad.State            ( MonadState
                                                 , StateT
                                                 , evalStateT
-                                                , gets
                                                 )
-import           Data.Foldable                  ( foldl' )
-import           Data.Monoid                    ( Any(Any) )
-import           Data.Semigroup                 ( Sum(Sum) )
-import           Data.Text                      ( Text )
-import           Foreign.C                      ( CInt )
-import           Paths_game1                    ( )
-import           SDL                            ( ($=)
-                                                , Point(P)
-                                                , Renderer
-                                                , V2(V2)
-                                                , _x
-                                                , _y
-                                                )
-
 import           Game1.GameState                ( GameState(..)
                                                 , playerPos
                                                 )
@@ -45,7 +23,6 @@ import           Game1.Input                    ( Intent(Idle, Move, Quit)
                                                 , pollEventPayloads
                                                 )
 import           Game1.Player                   ( nextPlayerPos
-                                                , renderPlayer
                                                 , startPosition
                                                 )
 import           Game1.Resources                ( Resources(..)
@@ -56,7 +33,6 @@ import           Game1.Window                   ( withWindow )
 import           Game1.Scene                    ( drawScene )
 
 import qualified SDL
-import qualified SDL.Image
 
 main :: IO ()
 main = do
