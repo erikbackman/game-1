@@ -2,7 +2,7 @@ module Game1.Window where
 
 import Control.Monad.IO.Class (MonadIO)
 import Data.Text (Text)
-import Foreign.C ( CInt )
+import Foreign.C (CInt)
 import SDL (Point (P), V2 (V2))
 import qualified SDL
 
