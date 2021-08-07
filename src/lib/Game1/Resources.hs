@@ -1,4 +1,6 @@
-module Game1.Resources where
+module Game1.Resources
+  (Resources (..), withResources)
+where
 
 import           Control.Monad.IO.Class (MonadIO (liftIO))
 import           Paths_game1
@@ -23,6 +25,12 @@ loadResources window = do
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path
     loadAssetWithRenderer r name = liftIO $ getDataFileName ("assets/" <> name) >>= loadTexture r
+
+withResources :: SDL.Window -> (Resources -> IO ()) -> IO ()
+withResources window f = do
+  resources <- loadResources window
+  f resources
+  destroyResources resources
 
 destroyResources :: Resources -> IO ()
 destroyResources Resources

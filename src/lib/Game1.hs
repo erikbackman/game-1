@@ -25,22 +25,20 @@ import           Game1.Input            (Intent (Idle, Move, Quit),
                                          inputToIntent, pollEventPayloads)
 import           Game1.Player           (nextPlayerPos, renderPlayer,
                                          startPosition)
-import           Game1.Resources        (Resources (..), destroyResources,
-                                         loadResources)
+import           Game1.Resources        (Resources (..), withResources)
 import           Game1.Window           (withWindow)
+
+import           Game1.Scene            (drawScene)
 
 import qualified SDL
 import qualified SDL.Image
-import Game1.Scene (drawScene)
 
 main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
 
-  withWindow "Game1" windowConfig \w -> do
-    resources <- loadResources w
-    runGame1 resources initState mainLoop
-    destroyResources resources
+  withWindow "Game1" windowConfig \w ->
+    withResources w \r -> runGame1 r initState mainLoop
 
   where
     initState = GameState { _playerPos = startPosition }
