@@ -27,6 +27,7 @@ library
     base,
     sdl2,
     sdl2-image,
+    linear,
     text,
     mtl,
     extra,

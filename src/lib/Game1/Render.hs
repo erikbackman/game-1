@@ -1,16 +1,12 @@
 module Game1.Render where
 
 import Control.Monad.IO.Class (MonadIO)
-import SDL
-import Foreign.C (CInt(CInt))
-import Control.Monad.Reader.Class (MonadReader, asks)
-
-import Game1.Resources
-
+import Foreign.C (CInt)
+import SDL (Point, V2 (V2))
 import qualified SDL
 
-renderTexture
-  :: MonadIO m => SDL.Renderer -> SDL.Texture -> (Point V2 CInt) -> m ()
+renderTexture ::
+  MonadIO m => SDL.Renderer -> SDL.Texture -> (Point V2 CInt) -> m ()
 renderTexture renderer tex pos = do
   ti <- SDL.queryTexture tex
   let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)

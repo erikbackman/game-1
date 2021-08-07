@@ -5,4 +5,3 @@ import Paths_game1
 
 main :: IO ()
 main = Game1.main
-

@@ -1,12 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Game1.GameState
-  (GameState(..), playerPos)
-where
+module Game1.GameState (GameState (..), playerPos) where
 
-import SDL
-import Foreign.C
-import Control.Lens
+import Control.Lens (makeLenses)
+import Foreign.C (CInt)
+import SDL (Point, V2)
 
 data GameState = GameState
   { _playerPos :: Point V2 CInt
