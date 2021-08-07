@@ -41,6 +41,7 @@ main = do
   withWindow "Game1"
              windowConfig
              \w -> withResources w \r -> runGame1 r initState mainLoop
+  SDL.quit
 
  where
   initState    = GameState { _playerPos = startPosition }
@@ -58,7 +59,7 @@ mainLoop
 mainLoop = do
   input <- pollEventPayloads
   case inputToIntent input of
-    Quit       -> SDL.quit
+    Quit       -> pure ()
     Idle       -> step
     Move delta -> playerPos %= nextPlayerPos delta >> step
 
