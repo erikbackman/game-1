@@ -1,8 +1,6 @@
-*.log
-tmp/
 result
 result-doc
 result-data
-.direnv/
+.direnv
 bin-tmp
 src/dist-newstyle/
