@@ -39,3 +39,10 @@ renderPlayer (Rectangle pos _) = do
   renderer <- asks sdl_renderer
   (tx, _) <- asks tex_player
   renderTexture renderer tx pos
+
+-- TODO Move/fix this shit
+renderEnemy :: (MonadIO m, MonadReader Resources m) => Rectangle CInt -> m ()
+renderEnemy (Rectangle pos _) = do
+  renderer <- asks sdl_renderer
+  (tx, _) <- asks tex_enemy
+  renderTexture renderer tx pos

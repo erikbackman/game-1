@@ -7,6 +7,7 @@ import qualified SDL.Image
 
 data Resources = Resources
   { tex_player :: (SDL.Texture, SDL.TextureInfo),
+    tex_enemy :: (SDL.Texture, SDL.TextureInfo),
     tex_tile :: (SDL.Texture, SDL.TextureInfo),
     sdl_renderer :: SDL.Renderer
   }
@@ -16,6 +17,7 @@ loadResources window = do
   sdl_renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
   let loadAsset = loadAssetWithRenderer sdl_renderer
   tex_player <- loadAsset "player.png"
+  tex_enemy <- loadAsset "enemy.png"
   tex_tile <- loadAsset "tile.png"
   pure $ Resources {..}
   where
