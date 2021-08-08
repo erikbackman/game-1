@@ -2,8 +2,13 @@ pkgs:
 
 let
   package = import ./src/default.nix pkgs;
-  haskellTooling = let
-  in with pkgs;
+
+  sdlPkgs = with pkgs;
+    [ SDL
+      SDL_gfx
+      SDL_image ];
+
+  haskellTooling = with pkgs;
     [ ghcid
       cabal-install
       haskellPackages.hindent
@@ -13,7 +18,7 @@ in
 pkgs.mkShell {
   nativeBuildInputs = [ pkgs.pkg-config ];
   inputsFrom = [ package.env ];
-  buildInputs = haskellTooling;
+  buildInputs = haskellTooling ++ sdlPkgs;
   shellHook = ''
     alias cb="cabal v2-build"
   '';

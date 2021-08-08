@@ -6,8 +6,8 @@ import qualified SDL
 import qualified SDL.Image
 
 data Resources = Resources
-  { tex_player :: SDL.Texture,
-    tex_tile :: SDL.Texture,
+  { tex_player :: (SDL.Texture, SDL.TextureInfo),
+    tex_tile :: (SDL.Texture, SDL.TextureInfo),
     sdl_renderer :: SDL.Renderer
   }
 
@@ -20,7 +20,11 @@ loadResources window = do
   pure $ Resources {..}
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path
-    loadAssetWithRenderer r name = liftIO $ getDataFileName ("assets/" <> name) >>= loadTexture r
+    loadAssetWithRenderer r name = do
+      path <- liftIO $ getDataFileName ("assets/" <> name)
+      tex <- loadTexture r path
+      ti <- SDL.queryTexture tex
+      pure (tex, ti)
 
 withResources :: SDL.Window -> (Resources -> IO ()) -> IO ()
 withResources window f = do
@@ -35,6 +39,6 @@ destroyResources
       tex_tile,
       sdl_renderer
     } = do
-    SDL.destroyTexture tex_player
-    SDL.destroyTexture tex_tile
+    SDL.destroyTexture $ fst tex_player
+    SDL.destroyTexture $ fst tex_tile
     SDL.destroyRenderer sdl_renderer

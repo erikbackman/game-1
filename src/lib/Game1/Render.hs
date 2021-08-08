@@ -11,4 +11,5 @@ renderTexture renderer tex pos = do
   ti <- SDL.queryTexture tex
   let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
       extent = V2 w h
+
   SDL.copy renderer tex Nothing (Just $ SDL.Rectangle pos extent)

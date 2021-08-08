@@ -4,7 +4,7 @@
 module Game1 where
 
 import Control.Concurrent (threadDelay)
-import Control.Lens ((%=))
+import Control.Lens (use, (%=))
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Reader
   ( MonadReader (..),
@@ -18,7 +18,8 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    playerPos,
+    initGameState,
+    playerRect,
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -27,7 +28,6 @@ import Game1.Input
   )
 import Game1.Player
   ( nextPlayerPos,
-    startPosition,
   )
 import Game1.Resources
   ( Resources (..),
@@ -43,12 +43,10 @@ main = do
 
   withWindow
     "Game1"
-    windowConfig
-    \w -> withResources w \r -> runGame1 r initState mainLoop
+    SDL.defaultWindow
+    \w -> withResources w \r -> do
+      runGame1 r (initGameState r) mainLoop
   SDL.quit
-  where
-    initState = GameState {_playerPos = startPosition}
-    windowConfig = SDL.defaultWindow
 
 newtype Game1 a
   = Game1 (ReaderT Resources (StateT GameState IO) a)
@@ -64,7 +62,10 @@ mainLoop = do
   case inputToIntent input of
     Quit -> pure ()
     Idle -> step
-    Move delta -> playerPos %= nextPlayerPos delta >> step
+    Move delta -> do
+      state <- use id
+      liftIO $ print state
+      playerRect %= nextPlayerPos delta >> step
   where
     step = do
       r <- asks sdl_renderer
