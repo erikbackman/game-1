@@ -21,15 +21,15 @@ data GameState = GameState
 startPosition :: Point V2 CInt
 startPosition = P $ V2 100 100
 
-enemeyStartPosition :: Point V2 CInt
-enemeyStartPosition = P $ V2 300 300
+enemyStartPosition :: Point V2 CInt
+enemyStartPosition = P $ V2 300 300
 
 initGameState :: Resources -> GameState
 initGameState Resources {tex_player} =
   let ti = snd tex_player
       (pw, ph) = (SDL.textureWidth ti, SDL.textureHeight ti)
       pr = Rectangle startPosition (V2 pw ph)
-      er = Rectangle enemeyStartPosition (V2 pw ph)
+      er = Rectangle enemyStartPosition (V2 pw ph)
    in GameState {_playerRect = pr, _enemyRect = er}
 
 makeLenses ''GameState
