@@ -38,9 +38,11 @@ destroyResources :: Resources -> IO ()
 destroyResources
   Resources
     { tex_player,
+      tex_enemy,
       tex_tile,
       sdl_renderer
     } = do
     SDL.destroyTexture $ fst tex_player
+    SDL.destroyTexture $ fst tex_enemy
     SDL.destroyTexture $ fst tex_tile
     SDL.destroyRenderer sdl_renderer
