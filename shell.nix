@@ -14,6 +14,7 @@ let
       haskellPackages.hindent
       haskellPackages.ormolu
       haskellPackages.hasktags
+      haskellPackages.hoogle
       haskellPackages.haskell-language-server ];
 in
 pkgs.mkShell {
