@@ -24,30 +24,32 @@ library
     Game1.Window
   other-modules: Paths_game1
   build-depends:
+    -- sdl2-gfx,
     base,
+    extra,
+    lens,
+    linear,
+    mtl,
     sdl2,
     sdl2-image,
-    -- sdl2-gfx,
-    linear,
-    text,
-    mtl,
-    extra,
-    lens
+    sdl2-ttf,
+    text
   default-language: Haskell2010
   ghc-options:
     -fwarn-unused-imports
     -Wno-missing-home-modules
   default-extensions:
+    DerivingStrategies
     DuplicateRecordFields
     FlexibleContexts
     FlexibleInstances
     GeneralizedNewtypeDeriving
     LambdaCase
+    MultiWayIf
     NamedFieldPuns
-    ScopedTypeVariables
     OverloadedStrings
     RecordWildCards
-    MultiWayIf
+    ScopedTypeVariables
 
 executable game1
   main-is:             Main.hs
@@ -55,27 +57,28 @@ executable game1
     Paths_game1
   build-depends:
     base,
+    bytestring,
+    directory,
+    extra,
+    file-embed,
+    game1,
+    mtl,
+    paths,
     sdl2,
     sdl2-image,
-    text,
-    mtl,
-    extra,
-    paths,
-    directory,
-    file-embed,
-    bytestring,
-    game1
+    text
 
   hs-source-dirs: app
   default-language:    Haskell2010
   default-extensions:
+    DerivingStrategies
     DuplicateRecordFields
     FlexibleContexts
     FlexibleInstances
     GeneralizedNewtypeDeriving
     LambdaCase
+    MultiWayIf
     NamedFieldPuns
-    ScopedTypeVariables
     OverloadedStrings
     RecordWildCards
-    MultiWayIf
+    ScopedTypeVariables
