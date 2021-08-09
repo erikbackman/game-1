@@ -13,6 +13,7 @@ let
       cabal-install
       haskellPackages.hindent
       haskellPackages.ormolu
+      haskellPackages.hasktags
       haskellPackages.haskell-language-server ];
 in
 pkgs.mkShell {
