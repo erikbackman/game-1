@@ -23,5 +23,6 @@ pkgs.mkShell {
   buildInputs = haskellTooling ++ sdlPkgs;
   shellHook = ''
     alias cb="cabal v2-build"
+    alias cr="cabal v2-run"
   '';
 }
