@@ -36,6 +36,7 @@ library
   default-language: Haskell2010
   ghc-options:
     -fwarn-unused-imports
+    -Wno-missing-home-modules
   default-extensions:
     DuplicateRecordFields
     FlexibleContexts
@@ -50,7 +51,8 @@ library
 
 executable game1
   main-is:             Main.hs
-  other-modules: Paths_game1
+  other-modules:
+    Paths_game1
   build-depends:
     base,
     sdl2,
