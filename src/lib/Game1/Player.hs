@@ -12,7 +12,7 @@ import Game1.Resources
     sdl_renderer,
     tex_player,
   )
-import Game1.Window (withinBounds)
+import Game1.Window (outOfBounds)
 import SDL
   ( Point (P),
     Rectangle (..),
@@ -32,7 +32,8 @@ nextPlayerPos :: V2 CInt -> Rectangle CInt -> Rectangle CInt
 nextPlayerPos delta pr@(Rectangle pp@(P (V2 px py)) wh@(V2 pw ph)) =
   let newPos = pp + P delta
       np = Rectangle newPos wh
-   in if withinBounds newPos then np else pr
+   in -- TODO: We should keep track of when the window size changes
+      if outOfBounds np then pr else np
 
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Rectangle CInt -> m ()
 renderPlayer (Rectangle pos _) = do
