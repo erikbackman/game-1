@@ -3,7 +3,6 @@
 
 module Game1 where
 
-import Control.Concurrent (threadDelay)
 import Control.Lens (use, (%=))
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Reader
@@ -72,5 +71,4 @@ mainLoop = do
       SDL.clear r
       drawScene
       SDL.present r
-      liftIO $ threadDelay (1000 * 16)
       mainLoop
