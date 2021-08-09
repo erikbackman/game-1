@@ -1,6 +1,10 @@
+# nix
 result
 result-doc
 result-data
 .direnv
 bin-tmp
+# cabal
 src/dist-newstyle/
+# hasktags
+src/TAGS
