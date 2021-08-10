@@ -15,7 +15,8 @@ let
       haskellPackages.ormolu
       haskellPackages.hasktags
       haskellPackages.hoogle
-      haskellPackages.haskell-language-server ];
+      (haskell-language-server.override { supportedGhcVersions = [ "8104" ]; })
+    ];
 in
 pkgs.mkShell {
   nativeBuildInputs = [ pkgs.pkg-config ];
