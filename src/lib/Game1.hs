@@ -1,24 +1,20 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Game1 where
 
 import Control.Lens (use, (%=))
-import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Reader
-  ( MonadReader (..),
-    ReaderT (ReaderT, runReaderT),
-    asks,
+  ( ReaderT (ReaderT, runReaderT),
   )
 import Control.Monad.State
-  ( MonadState,
-    StateT,
+  ( StateT,
     evalStateT,
   )
 import Game1.GameState
   ( GameState (..),
-    initGameState,
-    playerRect,
+    initGameState, ppos, player, running
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -35,6 +31,9 @@ import Game1.Resources
 import Game1.Scene (drawScene)
 import Game1.Window (withWindow)
 import qualified SDL
+import qualified SDL.Time as Time
+import Control.Monad.RWS
+import Control.Lens.Lens
 
 main :: IO ()
 main = do
@@ -43,7 +42,7 @@ main = do
   withWindow
     "Game1"
     SDL.defaultWindow
-    \w -> withResources w \r -> do
+    \w -> withResources w \r ->
       runGame1 r (initGameState r) mainLoop
   SDL.quit
 
@@ -54,21 +53,40 @@ newtype Game1 a
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
+whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
+whileState p f = do
+  b <- use p
+  when b $ do
+   f
+   whileState p f
+
+update :: (MonadIO m, MonadState GameState m) => m ()
+update = do
+  input <- pollEventPayloads
+  case inputToIntent input of
+    Quit -> running #= False
+    Idle -> pure ()
+    Move delta -> do
+      state <- use id
+      player.ppos %= nextPlayerPos (_map state) delta
+
+render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
+render = do
+  r <- asks sdl_renderer
+  SDL.clear r
+  drawScene
+  SDL.present r
+
 mainLoop ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
-  input <- pollEventPayloads
-  case inputToIntent input of
-    Quit -> pure ()
-    Idle -> step
-    Move delta -> do
-      state <- use id
-      liftIO $ print state
-      playerRect %= nextPlayerPos delta >> step
-  where
-    step = do
-      r <- asks sdl_renderer
-      SDL.clear r
-      drawScene
-      SDL.present r
-      mainLoop
+  let fdelay = 1000 `div` 60
+  whileState running $ do
+    fstart <- Time.ticks
+    update
+    render
+    gs <- get
+    liftIO $ print gs
+    ftime <- fmap (fstart -) Time.ticks
+    when (fdelay > ftime) $ do
+      Time.delay (fdelay - ftime)

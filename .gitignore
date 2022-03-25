@@ -8,3 +8,4 @@ bin-tmp
 src/dist-newstyle/
 # hasktags
 src/TAGS
+tags

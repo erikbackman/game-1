@@ -12,12 +12,13 @@ import Game1.Resources
     sdl_renderer,
     tex_player,
   )
-import Game1.Window (outOfBounds)
 import SDL
   ( Point (P),
     Rectangle (..),
     V2 (V2),
   )
+import Game1.GameState
+import Foreign.C.Types (CInt(CInt))
 
 intersectsWith :: Rectangle CInt -> Rectangle CInt -> Bool
 intersectsWith
@@ -28,22 +29,21 @@ intersectsWith
       && py < oy + oh
       && py + ph > oy
 
-nextPlayerPos :: V2 CInt -> Rectangle CInt -> Rectangle CInt
-nextPlayerPos delta pr@(Rectangle pp@(P (V2 px py)) wh@(V2 pw ph)) =
-  let newPos = pp + P delta
-      np = Rectangle newPos wh
-   in -- TODO: We should keep track of when the window size changes
-      if outOfBounds np then pr else np
+nextPlayerPos :: Map -> V2 Int -> V2 Int -> V2 Int
+nextPlayerPos m delta v@(V2 v1 v2) =
+  let 
+      u  = v + delta
+      tv = getTile (v1,v2) m
+   in
+    case tv of
+      Empty -> u
+      _     -> v 
 
-renderPlayer :: (MonadIO m, MonadReader Resources m) => Rectangle CInt -> m ()
-renderPlayer (Rectangle pos _) = do
+renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
+renderPlayer (Player (V2 v1 v2)) = do
   renderer <- asks sdl_renderer
   (tx, _) <- asks tex_player
-  renderTexture renderer tx pos
-
--- TODO Move/fix this shit
-renderEnemy :: (MonadIO m, MonadReader Resources m) => Rectangle CInt -> m ()
-renderEnemy (Rectangle pos _) = do
-  renderer <- asks sdl_renderer
-  (tx, _) <- asks tex_enemy
-  renderTexture renderer tx pos
+  let u1 = CInt $ 32*fromIntegral v1 :: CInt
+      u2 = CInt $ 32*fromIntegral v2 :: CInt
+      u  = V2 u1 u2
+  renderTexture renderer tx u

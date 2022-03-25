@@ -8,14 +8,15 @@ import Control.Monad.State.Class
   ( MonadState,
     gets,
   )
-import Game1.GameState (GameState (..))
-import Game1.Player (renderEnemy, renderPlayer)
+import Game1.GameState (GameState (..), drawMap)
+import Game1.Player (renderPlayer)
 import Game1.Resources (Resources (..))
 
 drawScene ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 drawScene = do
-  p <- gets _playerRect
-  e <- gets _enemyRect
+  p <- gets _player
+  m <- gets _map
+
+  drawMap m
   renderPlayer p
-  renderEnemy e

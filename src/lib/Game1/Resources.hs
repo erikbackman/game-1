@@ -16,7 +16,7 @@ loadResources :: SDL.Window -> IO Resources
 loadResources window = do
   sdl_renderer <- SDL.createRenderer window (-1) SDL.defaultRenderer
   let loadAsset = loadAssetWithRenderer sdl_renderer
-  tex_player <- loadAsset "player.png"
+  tex_player <- loadAsset "knight.png"
   tex_enemy <- loadAsset "enemy.png"
   tex_tile <- loadAsset "tile.png"
   pure $ Resources {..}
