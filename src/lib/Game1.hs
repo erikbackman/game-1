@@ -14,7 +14,7 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    initGameState, ppos, player, running
+    initGameState, ppos, player, running, _ppos, _player
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -68,6 +68,7 @@ update = do
     Idle -> pure ()
     Move delta -> do
       state <- use id
+      liftIO $ print delta
       player.ppos %= nextPlayerPos (_map state) delta
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
@@ -83,10 +84,13 @@ mainLoop = do
   let fdelay = 1000 `div` 60
   whileState running $ do
     fstart <- Time.ticks
-    update
-    render
     gs <- get
+
+
+    update
     liftIO $ print gs
+
+    render
     ftime <- fmap (fstart -) Time.ticks
     when (fdelay > ftime) $ do
       Time.delay (fdelay - ftime)

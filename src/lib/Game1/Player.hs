@@ -32,12 +32,12 @@ intersectsWith
 nextPlayerPos :: Map -> V2 Int -> V2 Int -> V2 Int
 nextPlayerPos m delta v@(V2 v1 v2) =
   let 
-      u  = v + delta
-      tv = getTile (v1,v2) m
+      u@(V2 u1 u2) = v + delta
+      tv = getTile (u1,u2) m
    in
     case tv of
       Empty -> u
-      _     -> v 
+      _     -> v
 
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
 renderPlayer (Player (V2 v1 v2)) = do
