@@ -32,8 +32,8 @@ intersectsWith
 nextPlayerPos :: Map -> V2 Int -> V2 Int -> V2 Int
 nextPlayerPos m delta v@(V2 v1 v2) =
   let 
-      u@(V2 u1 u2) = v + delta
-      tv = getTile (u1,u2) m
+      u  = v + delta
+      tv = getTile u m
    in
     case tv of
       Empty -> u

@@ -86,7 +86,6 @@ mainLoop = do
     fstart <- Time.ticks
     gs <- get
 
-
     update
     liftIO $ print gs
 

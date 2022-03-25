@@ -9,6 +9,7 @@ data Resources = Resources
   { tex_player :: (SDL.Texture, SDL.TextureInfo),
     tex_enemy :: (SDL.Texture, SDL.TextureInfo),
     tex_tile :: (SDL.Texture, SDL.TextureInfo),
+    tex_pillar :: (SDL.Texture, SDL.TextureInfo),
     sdl_renderer :: SDL.Renderer
   }
 
@@ -19,6 +20,7 @@ loadResources window = do
   tex_player <- loadAsset "knight.png"
   tex_enemy <- loadAsset "enemy.png"
   tex_tile <- loadAsset "tile.png"
+  tex_pillar <- loadAsset "pillar.png"
   pure $ Resources {..}
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path

@@ -10,12 +10,13 @@ import Linear.V2 (V2 (V2))
 import qualified SDL
 import Control.Monad.RWS
 import Game1.Render (renderTexture)
+import SDL (Texture)
 
 type Entity = Char
 
 type Map = [[Int]]
 
-data Tile = Solid | Empty deriving (Eq, Show)
+data Tile = Solid Int | Empty deriving (Eq, Show)
 
 gameMap :: Map
 gameMap = [
@@ -23,34 +24,48 @@ gameMap = [
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
+  [ 3, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
+  [ 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
   [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ]
   ]
 
-getTile :: (Int, Int) -> Map -> Tile
-getTile (x,y) m =
+getTile :: V2 Int -> Map -> Tile
+getTile (V2 x y) m =
   case m !! x !! y of
-       3 -> Solid
+       3 -> Solid 3
+       2 -> Solid 2
        _ -> Empty
+
+tileToTexture :: Resources -> Tile -> Texture
+tileToTexture r t = fst $ case t of
+  Solid 2 -> tex_pillar r
+  Solid 3 -> tex_tile r
+  _       -> tex_tile r 
 
 cintPoint :: (Int, Int) -> V2 CInt
 cintPoint (x,y) = V2 (fromIntegral x) (fromIntegral y)
 
 drawMap :: (MonadIO m, MonadReader Resources m) => Map -> m ()
 drawMap m = do
-  r <- asks sdl_renderer
-  (tx, _) <- asks tex_tile
-  
-  let pts = [ cintPoint (x*32,y*32) | (y, row) <- enumerate m, (x, til) <- enumerate row ]
-  forM_ pts (renderTexture r tx)
-  where
+  ren <- asks sdl_renderer
+  res <- ask
+
+  let
+    renderTile p = do
+      let
+        t = getTile (fmap fromIntegral p) m
+        targetPos = p*32
+      renderTexture ren (tileToTexture res t) targetPos
+      
     enumerate = zip [0..]
+    pts = [ cintPoint (x, y) | (y, row) <- enumerate m, (x, til) <- enumerate row ]
+    
+  forM_ pts renderTile
 
 newtype Player = Player
   { _ppos :: V2 Int
