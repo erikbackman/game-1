@@ -7,7 +7,7 @@ import SDL (Point (P), Rectangle (Rectangle), V2 (V2))
 import qualified SDL
 
 windowSize :: V2 CInt
-windowSize = V2 1280 720
+windowSize = V2 384 384
 
 outOfBounds :: Rectangle CInt -> Bool
 outOfBounds (Rectangle (P (V2 x y)) (V2 w h)) =
