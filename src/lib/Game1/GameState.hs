@@ -3,14 +3,15 @@
 
 module Game1.GameState where
 
-import Control.Lens (makeLenses)
 import Foreign.C (CInt)
-import Game1.Resources (Resources (..))
+import Game1.Resources (Resources (..), useResources)
 import Linear.V2 (V2 (V2))
 import qualified SDL
 import Control.Monad.RWS
 import Game1.Render (renderTexture)
 import SDL (Texture)
+import Control.Lens (makeLenses)
+import Text.Read (readMaybe)
 
 type Entity = Char
 
@@ -18,21 +19,8 @@ type Map = [[Int]]
 
 data Tile = Solid Int | Empty deriving (Eq, Show)
 
-gameMap :: Map
-gameMap = [
-  [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  [ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ]
-  ]
+parseMap :: String -> Maybe Map
+parseMap = (traverse . traverse) readMaybe . fmap words . lines
 
 getTile :: V2 Int -> Map -> Tile
 getTile (V2 x y) m =
@@ -41,8 +29,8 @@ getTile (V2 x y) m =
        2 -> Solid 2
        _ -> Empty
 
-tileToTexture :: Resources -> Tile -> Texture
-tileToTexture r t = fst $ case t of
+tileToTexture :: MonadReader Resources m => Tile -> m Texture
+tileToTexture t = useResources $ \r -> pure $ fst $ case t of
   Solid 2 -> tex_pillar r
   Solid 3 -> tex_tile r
   _       -> tex_tile r 
@@ -52,15 +40,13 @@ cintPoint (x,y) = V2 (fromIntegral x) (fromIntegral y)
 
 drawMap :: (MonadIO m, MonadReader Resources m) => Map -> m ()
 drawMap m = do
-  ren <- asks sdl_renderer
-  res <- ask
-
   let
     renderTile p = do
       let
         t = getTile (fmap fromIntegral p) m
         targetPos = p*32
-      renderTexture ren (tileToTexture res t) targetPos
+      tex <- tileToTexture t
+      renderTexture tex targetPos
       
     enumerate = zip [0..]
     pts = [ cintPoint (x, y) | (y, row) <- enumerate m, (x, til) <- enumerate row ]
@@ -81,13 +67,13 @@ data GameState = GameState
 startPosition :: V2 Int
 startPosition = V2 1 1
 
-initGameState :: Resources -> GameState
-initGameState Resources {tex_player} =
+initGameState :: Map -> Resources -> GameState
+initGameState m Resources {tex_player} =
   let ti = snd tex_player
       (pw, ph) = (SDL.textureWidth ti, SDL.textureHeight ti)
       pr = Player startPosition 
    in GameState { _player = pr
-                , _map = gameMap
+                , _map = m
                 , _running = True
                 }
 

@@ -14,7 +14,7 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    initGameState, ppos, player, running, _ppos, _player
+    initGameState, ppos, player, running, _ppos, _player, Map, parseMap
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -38,13 +38,17 @@ import Control.Lens.Lens
 main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
+  gameMap <- loadMap "assets/map.txt"
 
-  withWindow
-    "Game1"
-    SDL.defaultWindow
-    \w -> withResources w \r ->
-      runGame1 r (initGameState r) mainLoop
-  SDL.quit
+  case gameMap of
+    Nothing -> SDL.quit
+    Just m -> do
+      withWindow
+        "Game1"
+        SDL.defaultWindow
+        \w -> withResources w \r ->
+          runGame1 r (initGameState m r) mainLoop
+      SDL.quit
 
 newtype Game1 a
   = Game1 (ReaderT Resources (StateT GameState IO) a)
@@ -52,6 +56,9 @@ newtype Game1 a
 
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
+
+loadMap :: MonadIO m => FilePath -> m (Maybe Map)
+loadMap = liftIO . (readFile >=> pure . parseMap)
 
 whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
 whileState p f = do

@@ -1,9 +1,11 @@
-module Game1.Resources (Resources (..), withResources) where
+module Game1.Resources (Resources (..), withResources, useResources) where
 
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Paths_game1
 import qualified SDL
 import qualified SDL.Image
+import Control.Monad.RWS
+import Control.Monad
 
 data Resources = Resources
   { tex_player :: (SDL.Texture, SDL.TextureInfo),
@@ -35,6 +37,9 @@ withResources window f = do
   resources <- loadResources window
   f resources
   destroyResources resources
+
+useResources :: MonadReader Resources m => (Resources -> m a) -> m a
+useResources f = ask >>= f
 
 destroyResources :: Resources -> IO ()
 destroyResources

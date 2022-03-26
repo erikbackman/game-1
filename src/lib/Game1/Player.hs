@@ -41,9 +41,8 @@ nextPlayerPos m delta v@(V2 v1 v2) =
 
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
 renderPlayer (Player (V2 v1 v2)) = do
-  renderer <- asks sdl_renderer
   (tx, _) <- asks tex_player
   let u1 = CInt $ 32*fromIntegral v1 :: CInt
       u2 = CInt $ 32*fromIntegral v2 :: CInt
       u  = V2 u1 u2
-  renderTexture renderer tx u
+  renderTexture tx u
