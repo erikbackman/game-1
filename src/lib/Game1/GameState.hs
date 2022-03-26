@@ -62,9 +62,9 @@ drawMap :: (MonadIO m, MonadReader Resources m) => Map -> m ()
 drawMap m =
   mapM_
     renderTile
-    [ (til, V2 (fromIntegral x) (fromIntegral y))
+    [ (tile, V2 (fromIntegral x) (fromIntegral y))
       | (y, row) <- enumerate m,
-        (x, til) <- enumerate row
+        (x, tile) <- enumerate row
     ]
   where
     enumerate = zip [0 ..]

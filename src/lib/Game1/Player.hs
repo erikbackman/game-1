@@ -12,10 +12,10 @@ import Game1.Resources
 import SDL
   ( Point (P),
     Rectangle (..),
-    V2 (V2),
   )
 import Game1.GameState
 import Foreign.C.Types (CInt(CInt))
+import Linear
 
 intersectsWith :: Rectangle CInt -> Rectangle CInt -> Bool
 intersectsWith
@@ -30,16 +30,15 @@ nextPlayerPos :: Map -> V2 Int -> V2 Int -> V2 Int
 nextPlayerPos m delta v@(V2 v1 v2) =
   let 
       u  = v + delta
-      tv = getTileType u m
+      tt = getTileType u m
    in
-    case tv of
+    case tt of
       Empty -> u
       _     -> v
 
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
-renderPlayer (Player (V2 v1 v2) speed) = do
+renderPlayer (Player v speed) = do
   (tx, _) <- asks tex_player
-  let u1 = CInt $ speed*32*fromIntegral v1 :: CInt
-      u2 = CInt $ speed*32*fromIntegral v2 :: CInt
-      u  = V2 u1 u2
+  let
+    u = fmap (CInt . (speed*32*) . fromIntegral) v
   renderTexture tx u
