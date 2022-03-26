@@ -45,9 +45,6 @@ updatePlayer m dir_vec p@(Player v@(V2 v1 v2) speed d) =
             Empty -> u
             _ -> v
 
-renderPlayer2 :: (MonadIO m, MonadReader Resources m) => Player -> m ()
-renderPlayer2 = undefined
-
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
 renderPlayer (Player v _ d) = do
   (tx, _) <- asks tex_player
