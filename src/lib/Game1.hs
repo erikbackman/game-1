@@ -98,5 +98,4 @@ mainLoop = do
 
     render
     ftime <- fmap (fstart -) Time.ticks
-    when (fdelay > ftime) $ do
-      Time.delay (fdelay - ftime)
+    when (fdelay > ftime) $ Time.delay (fdelay - ftime)
