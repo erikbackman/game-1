@@ -18,9 +18,9 @@ data Player = Player
   deriving (Show)
 
 data GameState = GameState
-  { _gsPlayer :: Player,
-    _gsMap :: Map,
-    _gsRunning :: Bool
+  { _gs_player :: Player,
+    _gs_map :: Map,
+    _gs_running :: Bool
   }
   deriving stock (Show)
 
@@ -36,7 +36,7 @@ startPosition = V2 1 1
 initGameState :: Map -> Resources -> GameState
 initGameState m Resources {tex_player} =
   GameState
-    { _gsPlayer = Player startPosition 1,
-      _gsMap = m,
-      _gsRunning = True
+    { _gs_player = Player startPosition 1,
+      _gs_map = m,
+      _gs_running = True
     }

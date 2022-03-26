@@ -16,9 +16,9 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    gsMap,
-    gsPlayer,
-    gsRunning,
+    gs_map,
+    gs_player,
+    gs_running,
     initGameState,
     parseMap,
   )
@@ -76,11 +76,11 @@ update :: (MonadIO m, MonadState GameState m) => m ()
 update = do
   input <- pollEventPayloads
   case inputToIntent input of
-    Quit -> gsRunning #= False
+    Quit -> gs_running #= False
     Idle -> pure ()
     Move delta -> do
-      m <- use gsMap
-      gsPlayer %= updatePlayer m delta
+      m <- use gs_map
+      gs_player %= updatePlayer m delta
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
 render = do
@@ -93,7 +93,7 @@ mainLoop ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
   let fdelay = 1000 `div` 60
-  whileState gsRunning $ do
+  whileState gs_running $ do
     fstart <- Time.ticks
     update
     render
