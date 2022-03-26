@@ -11,10 +11,8 @@ renderTexture ::
 renderTexture tex pos = do
   ti <- SDL.queryTexture tex
   renderer <- asks sdl_renderer
-  let (w, h) = (SDL.textureWidth ti, SDL.textureHeight ti)
-      extent = V2 w h
-
-  SDL.copy renderer tex Nothing (Just $ SDL.Rectangle (SDL.P pos) extent)
+  let tsize = V2 (SDL.textureWidth ti) (SDL.textureHeight ti)
+  SDL.copy renderer tex Nothing (Just $ SDL.Rectangle (SDL.P pos) tsize)
 
 withRenderer :: MonadReader Resources m => (SDL.Renderer -> m a) -> m a
 withRenderer f = asks sdl_renderer >>= f
