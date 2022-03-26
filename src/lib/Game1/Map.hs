@@ -28,7 +28,7 @@ drawMap m =
     renderTile (t, p) = do
       tex <- tileToTexture t
       let targetPos = 32 * p
-      renderTexture tex targetPos
+      renderTexture tex targetPos (V2 False False)
 
 tileToTexture :: MonadReader Resources m => Int -> m Texture
 tileToTexture t = useResources $ \r -> pure $

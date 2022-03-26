@@ -1,5 +1,6 @@
 module Game1.Player where
 
+import Control.Lens ((^.))
 import Control.Lens.Setter ((.~))
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Reader.Class
@@ -10,6 +11,7 @@ import Data.Function ((&))
 import Foreign.C (CInt)
 import Foreign.C.Types (CInt (CInt))
 import Game1.GameState
+import Game1.Map
 import Game1.Render (renderTexture)
 import Game1.Resources
   ( Resources (..),
@@ -19,7 +21,6 @@ import SDL
   ( Point (P),
     Rectangle (..),
   )
-import Game1.Map
 
 intersectsWith :: Rectangle CInt -> Rectangle CInt -> Bool
 intersectsWith
@@ -31,18 +32,25 @@ intersectsWith
       && py + ph > oy
 
 updatePlayer :: Map -> V2 Int -> Player -> Player
-updatePlayer m delta p@(Player v@(V2 v1 v2) speed) =
-  p & playerPos .~ newPos
+updatePlayer m dir_vec p@(Player v@(V2 v1 v2) speed d) =
+  p & playerPos
+    .~ newPos & playerDir
+    .~ (if dir_vec ^. _x == 0 then d else dir_vec)
+    
   where
     newPos =
-      let u = v + fmap (* speed) delta
+      let u = v + fmap (* speed) dir_vec
           tt = getTileType u m
        in case tt of
             Empty -> u
             _ -> v
 
+renderPlayer2 :: (MonadIO m, MonadReader Resources m) => Player -> m ()
+renderPlayer2 = undefined
+
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
-renderPlayer (Player v _) = do
+renderPlayer (Player v _ d) = do
   (tx, _) <- asks tex_player
   let target = fmap (CInt . (32 *) . fromIntegral) v
-  renderTexture tx target
+      tex_dir = V2 (d ^. _x == (-1)) False
+  renderTexture tx target tex_dir

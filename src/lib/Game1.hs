@@ -78,9 +78,9 @@ update = do
   case inputToIntent input of
     Quit -> gs_running #= False
     Idle -> pure ()
-    Move delta -> do
+    Move dir_vec -> do
       m <- use gs_map
-      gs_player %= updatePlayer m delta
+      gs_player %= updatePlayer m dir_vec
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
 render = do

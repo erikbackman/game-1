@@ -13,7 +13,8 @@ type Entity = Char
 
 data Player = Player
   { _playerPos :: V2 Int,
-    _playerSpeed :: Int
+    _playerSpeed :: Int,
+    _playerDir :: V2 Int
   }
   deriving (Show)
 
@@ -36,7 +37,7 @@ startPosition = V2 1 1
 initGameState :: Map -> Resources -> GameState
 initGameState m Resources {tex_player} =
   GameState
-    { _gs_player = Player startPosition 1,
+    { _gs_player = Player startPosition 1 (V2 0 0),
       _gs_map = m,
       _gs_running = True
     }
