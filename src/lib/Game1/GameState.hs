@@ -26,7 +26,7 @@ data TileType = Solid Int | Empty deriving (Eq, Show)
 
 data Player = Player
   { _playerPos :: V2 Int,
-    _playerSpeed :: Int32
+    _playerSpeed :: Int
   }
   deriving (Show)
 

@@ -5,6 +5,8 @@
 module Game1 where
 
 import Control.Lens (use, (%=))
+import Control.Lens.Lens
+import Control.Monad.RWS
 import Control.Monad.Reader
   ( ReaderT (ReaderT, runReaderT),
   )
@@ -14,7 +16,12 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    initGameState, playerPos, Map, parseMap, gsMap, gsRunning, gsPlayer
+    Map,
+    gsMap,
+    gsPlayer,
+    gsRunning,
+    initGameState,
+    parseMap,
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -22,7 +29,7 @@ import Game1.Input
     pollEventPayloads,
   )
 import Game1.Player
-  ( nextPlayerPos,
+  ( updatePlayer,
   )
 import Game1.Resources
   ( Resources (..),
@@ -32,8 +39,6 @@ import Game1.Scene (drawScene)
 import Game1.Window (withWindow)
 import qualified SDL
 import qualified SDL.Time as Time
-import Control.Monad.RWS
-import Control.Lens.Lens
 
 main :: IO ()
 main = do
@@ -64,8 +69,8 @@ whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
 whileState cond act = do
   b <- use cond
   when b $ do
-   act
-   whileState cond act
+    act
+    whileState cond act
 
 update :: (MonadIO m, MonadState GameState m) => m ()
 update = do
@@ -75,7 +80,7 @@ update = do
     Idle -> pure ()
     Move delta -> do
       m <- use gsMap
-      gsPlayer . playerPos %= nextPlayerPos m delta
+      gsPlayer %= updatePlayer m delta
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
 render = do
