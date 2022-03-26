@@ -8,9 +8,10 @@ import Control.Monad.State.Class
   ( MonadState,
     gets,
   )
-import Game1.GameState (GameState (..), drawMap)
+import Game1.GameState (GameState (..))
 import Game1.Player (renderPlayer)
 import Game1.Resources (Resources (..))
+import Game1.Map
 
 drawScene ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()

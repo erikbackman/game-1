@@ -19,6 +19,7 @@ import SDL
   ( Point (P),
     Rectangle (..),
   )
+import Game1.Map
 
 intersectsWith :: Rectangle CInt -> Rectangle CInt -> Bool
 intersectsWith

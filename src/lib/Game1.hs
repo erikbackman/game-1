@@ -16,7 +16,6 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    Map,
     gsMap,
     gsPlayer,
     gsRunning,
@@ -28,6 +27,7 @@ import Game1.Input
     inputToIntent,
     pollEventPayloads,
   )
+import Game1.Map (Map)
 import Game1.Player
   ( updatePlayer,
   )

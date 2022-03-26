@@ -22,6 +22,7 @@ library
     Game1.Resources
     Game1.Scene
     Game1.Window
+    Game1.Map
   other-modules: Paths_game1
   build-depends:
     -- sdl2-gfx,
