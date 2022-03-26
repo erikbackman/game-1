@@ -15,8 +15,8 @@ import Game1.Resources (Resources (..))
 drawScene ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 drawScene = do
-  p <- gets _player
-  m <- gets _map
+  p <- gets _gsPlayer
+  m <- gets _gsMap
 
   drawMap m
   renderPlayer p

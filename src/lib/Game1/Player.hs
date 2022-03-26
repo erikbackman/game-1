@@ -8,10 +8,7 @@ import Control.Monad.Reader.Class
 import Foreign.C (CInt)
 import Game1.Render (renderTexture)
 import Game1.Resources
-  ( Resources (..),
-    sdl_renderer,
-    tex_player,
-  )
+  ( Resources (..) )
 import SDL
   ( Point (P),
     Rectangle (..),
@@ -33,16 +30,16 @@ nextPlayerPos :: Map -> V2 Int -> V2 Int -> V2 Int
 nextPlayerPos m delta v@(V2 v1 v2) =
   let 
       u  = v + delta
-      tv = getTile u m
+      tv = getTileType u m
    in
     case tv of
       Empty -> u
       _     -> v
 
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
-renderPlayer (Player (V2 v1 v2)) = do
+renderPlayer (Player (V2 v1 v2) speed) = do
   (tx, _) <- asks tex_player
-  let u1 = CInt $ 32*fromIntegral v1 :: CInt
-      u2 = CInt $ 32*fromIntegral v2 :: CInt
+  let u1 = CInt $ speed*32*fromIntegral v1 :: CInt
+      u2 = CInt $ speed*32*fromIntegral v2 :: CInt
       u  = V2 u1 u2
   renderTexture tx u

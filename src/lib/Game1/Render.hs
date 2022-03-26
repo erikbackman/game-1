@@ -1,8 +1,7 @@
 module Game1.Render where
 
-import Control.Monad.IO.Class (MonadIO)
 import Foreign.C (CInt)
-import SDL (Point, V2 (V2))
+import SDL (V2 (V2))
 import qualified SDL
 import Control.Monad.RWS
 import Game1.Resources
@@ -17,4 +16,5 @@ renderTexture tex pos = do
 
   SDL.copy renderer tex Nothing (Just $ SDL.Rectangle (SDL.P pos) extent)
 
---withRenderer :: MonadResources
+withRenderer :: MonadReader Resources m => (SDL.Renderer -> m a) -> m a
+withRenderer f = asks sdl_renderer >>= f

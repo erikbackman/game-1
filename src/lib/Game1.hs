@@ -14,7 +14,7 @@ import Control.Monad.State
   )
 import Game1.GameState
   ( GameState (..),
-    initGameState, ppos, player, running, _ppos, _player, Map, parseMap
+    initGameState, playerPos, Map, parseMap, gsMap, gsRunning, gsPlayer
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -61,22 +61,21 @@ loadMap :: MonadIO m => FilePath -> m (Maybe Map)
 loadMap = liftIO . (readFile >=> pure . parseMap)
 
 whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
-whileState p f = do
-  b <- use p
+whileState cond act = do
+  b <- use cond
   when b $ do
-   f
-   whileState p f
+   act
+   whileState cond act
 
 update :: (MonadIO m, MonadState GameState m) => m ()
 update = do
   input <- pollEventPayloads
   case inputToIntent input of
-    Quit -> running #= False
+    Quit -> gsRunning #= False
     Idle -> pure ()
     Move delta -> do
-      state <- use id
-      liftIO $ print delta
-      player.ppos %= nextPlayerPos (_map state) delta
+      m <- use gsMap
+      gsPlayer . playerPos %= nextPlayerPos m delta
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
 render = do
@@ -89,13 +88,9 @@ mainLoop ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 mainLoop = do
   let fdelay = 1000 `div` 60
-  whileState running $ do
+  whileState gsRunning $ do
     fstart <- Time.ticks
-    gs <- get
-
     update
-    liftIO $ print gs
-
     render
     ftime <- fmap (fstart -) Time.ticks
     when (fdelay > ftime) $ Time.delay (fdelay - ftime)

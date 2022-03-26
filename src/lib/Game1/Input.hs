@@ -7,7 +7,6 @@ import Data.Semigroup
   ( Any (Any),
     Sum (Sum),
   )
-import Foreign.C
 import SDL
 
 data Intent
@@ -29,10 +28,10 @@ inputToIntent evps =
             if SDL.keyboardEventKeyMotion e == SDL.Pressed
               then case SDL.keysymScancode (SDL.keyboardEventKeysym e) of
                 SDL.ScancodeQ -> (Any True, mempty)
-                SDL.ScancodeW -> (Any False, Sum (V2 0 (-1)))
-                SDL.ScancodeS -> (Any False, Sum (V2 0 1))
+                SDL.ScancodeW -> (Any False, Sum (V2 0  (-1)))
+                SDL.ScancodeS -> (Any False, Sum (V2 0    1))
                 SDL.ScancodeA -> (Any False, Sum (V2 (-1) 0))
-                SDL.ScancodeD -> (Any False, Sum (V2 1 0))
+                SDL.ScancodeD -> (Any False, Sum (V2 1    0))
                 _ -> mempty
               else mempty
           _ -> mempty
