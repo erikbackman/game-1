@@ -7,7 +7,6 @@ import Control.Monad.Reader.Class
   ( MonadReader,
     asks,
   )
-import Data.Function ((&))
 import Foreign.C (CInt)
 import Foreign.C.Types (CInt (CInt))
 import Game1.GameState
@@ -32,14 +31,12 @@ intersectsWith
       && py + ph > oy
 
 updatePlayer :: Map -> V2 Int -> Player -> Player
-updatePlayer m dir_vec p@(Player v@(V2 v1 v2) speed d) =
-  p & playerPos
-    .~ newPos & playerDir
-    .~ (if dir_vec ^. _x == 0 then d else dir_vec)
-    
+updatePlayer m dir@(V2 d1 d2) p@(Player v@(V2 v1 v2) speed d) =
+  p { _playerPos = newPos, _playerDir = newDir }
   where
+    newDir = if d1 /= 0 && d1 /= v1 then dir else d
     newPos =
-      let u = v + fmap (* speed) dir_vec
+      let u = v + fmap (* speed) dir
           tt = getTileType u m
        in case tt of
             Empty -> u
