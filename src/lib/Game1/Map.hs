@@ -23,8 +23,8 @@ tileToTexture t = useResources $ \r -> pure $
 
 getTileType :: V2 Int -> Map -> TileType
 getTileType (V2 x y) m =
-  let i = m !! x !! y
-   in case i of
-        3 -> Solid 3
-        2 -> Solid 2
-        _ -> Empty
+  -- use ix lenses!
+  case m !! x !! y of
+    3 -> Solid 3
+    2 -> Solid 2
+    _ -> Empty

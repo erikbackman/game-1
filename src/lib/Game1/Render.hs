@@ -9,9 +9,6 @@ import Linear (M22, (!*))
 import SDL (V2 (V2))
 import qualified SDL
 
-class HasPosition t a where
-  getPos :: t -> V2 a
-
 renderTexture ::
   (MonadIO m, MonadReader Resources m, Integral a) => SDL.Texture -> V2 a -> V2 Bool -> m ()
 renderTexture tex posv rot = do

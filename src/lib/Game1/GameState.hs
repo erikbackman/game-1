@@ -12,9 +12,6 @@ import Game1.Map (Map, tileToTexture)
 import Control.Monad.RWS
 import Game1.Render
 import Control.Lens.Getter (use)
-import Foreign.C.Types
-
-type Entity = Char
 
 data PlayerState = Idle | Walking
   deriving Show
@@ -26,9 +23,6 @@ data Player = Player
     _playerState :: PlayerState
   }
   deriving (Show)
-
-instance HasPosition Player Int where
-  getPos = _playerPos
 
 data GameState = GameState
   { _gs_player :: Player,
