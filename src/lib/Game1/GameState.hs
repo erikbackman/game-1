@@ -1,5 +1,6 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Game1.GameState where
 
@@ -26,6 +27,9 @@ data Player = Player
   }
   deriving (Show)
 
+instance HasPosition Player Int where
+  getPos = _playerPos
+
 data GameState = GameState
   { _gs_player :: Player,
     _gs_map :: Map,
@@ -44,21 +48,17 @@ drawMap m = do
   dir <- use (gs_player . playerDir) 
   v <- use (gs_player . playerPos)
   let V2 v1 v2 = v
-  let xs = [v1 .. v1 + 2]
-      ys = [v2 .. v2 + 2]
       tiles = [ (tile, V2 (fromIntegral x) (fromIntegral y))
               | (y, row) <- enumerate m,
                 (x, tile) <- enumerate row
               ]
   mapM_ renderTile tiles
-    
   where
     enumerate = zip [0..]
     enumerateFromTo f t = zip [0..t] . drop f
     renderTile (t, p) = do
       tex <- tileToTexture t
-      let targetPos = 32 * p
-      renderTexture tex targetPos (V2 False False)
+      renderTexture tex p (V2 False False)
 
 startPosition :: Num n => V2 n
 startPosition = V2 1 1

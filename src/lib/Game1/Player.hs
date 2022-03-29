@@ -4,7 +4,7 @@ import Control.Monad.RWS
 import Foreign.C (CInt)
 import Game1.GameState
 import Game1.Map
-import Game1.Render (renderBasis, renderTexture, toCInt)
+import Game1.Render (renderTexture)
 import Game1.Resources
   ( Resources (..),
   )
@@ -40,5 +40,4 @@ move m dirv@(V2 d1 d2) p@(Player posv@(V2 p1 p2) speed curr_dirv _) =
 renderPlayer :: (MonadIO m, MonadReader Resources m) => Player -> m ()
 renderPlayer (Player v@(V2 v1 v2) _ d state) = do
   (tx, _) <- asks tex_player
-  let target = renderBasis !* (toCInt <$> v)
-  renderTexture tx target (orentation d)
+  renderTexture tx v (orentation d)
