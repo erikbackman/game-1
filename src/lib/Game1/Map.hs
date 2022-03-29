@@ -2,7 +2,6 @@ module Game1.Map where
 
 import Control.Monad.RWS
 import Foreign.C
-import Game1.Render
 import Game1.Resources
 import SDL
 
@@ -14,21 +13,6 @@ data Tile = Tile
   }
 
 data TileType = Solid Int | Empty deriving (Eq, Show)
-
-drawMap :: (MonadIO m, MonadReader Resources m) => Map -> m ()
-drawMap m =
-  mapM_
-    renderTile
-    [ (tile, V2 (fromIntegral x) (fromIntegral y))
-      | (y, row) <- enumerate m,
-        (x, tile) <- enumerate row
-    ]
-  where
-    enumerate = zip [0 ..]
-    renderTile (t, p) = do
-      tex <- tileToTexture t
-      let targetPos = 32 * p
-      renderTexture tex targetPos (V2 False False)
 
 tileToTexture :: MonadReader Resources m => Int -> m Texture
 tileToTexture t = useResources $ \r -> pure $

@@ -20,7 +20,7 @@ import Game1.GameState
     gs_player,
     gs_running,
     initGameState,
-    parseMap,
+    parseMap, PlayerState (Walking), playerState, playerPos
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -29,7 +29,7 @@ import Game1.Input
   )
 import Game1.Map (Map)
 import Game1.Player
-  ( updatePlayer,
+  ( move
   )
 import Game1.Resources
   ( Resources (..),
@@ -80,7 +80,7 @@ update = do
     Idle -> pure ()
     Move dir_vec -> do
       m <- use gs_map
-      gs_player %= updatePlayer m dir_vec
+      gs_player %= move m dir_vec
 
 render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
 render = do
@@ -97,5 +97,6 @@ mainLoop = do
     fstart <- Time.ticks
     update
     render
+
     ftime <- fmap (fstart -) Time.ticks
     when (fdelay > ftime) $ Time.delay (fdelay - ftime)
