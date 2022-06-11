@@ -2,13 +2,10 @@
 
 module Game1.Resources (Resources (..), withResources, useResources) where
 
-import Control.Monad.IO.Class (MonadIO (liftIO))
 import Paths_game1
 import qualified SDL
 import qualified SDL.Image
 import Control.Monad.RWS
-import Control.Monad
-import Data.Data
 
 data Resources = Resources
   { tex_player :: (SDL.Texture, SDL.TextureInfo),

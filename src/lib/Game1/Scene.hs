@@ -11,14 +11,14 @@ import Control.Monad.RWS
 renderHeart :: (MonadIO m, MonadReader Resources m) => m ()
 renderHeart = do
   (tex, _) <- asks tex_heart
-  renderTexture tex (V2 10 0) (V2 False False)
-  
+  renderTexture (V2 10 0) tex
+
 drawScene ::
   (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
 drawScene = do
   p <- use gs_player
   m <- use gs_map
-
+  
   drawMap m
   renderPlayer p
   renderHeart

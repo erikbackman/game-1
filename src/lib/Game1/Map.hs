@@ -4,8 +4,10 @@ import Control.Monad.RWS
 import Foreign.C
 import Game1.Resources
 import SDL
+import qualified Data.Map.Strict as SMap
+import Data.Map.Strict ((!?))
 
-type Map = [[Int]]
+type Map = SMap.Map (V2 Int) Int
 
 data Tile = Tile
   { tileType :: TileType,
@@ -22,9 +24,13 @@ tileToTexture t = useResources $ \r -> pure $
     _ -> tex_tile r
 
 getTileType :: V2 Int -> Map -> TileType
-getTileType (V2 x y) m =
-  -- use ix lenses!
-  case m !! x !! y of
-    3 -> Solid 3
-    2 -> Solid 2
-    _ -> Empty
+getTileType pos m =
+  case m !? pos of -- TODO: use ix lenses!
+    Just 3 -> Solid 3
+    Just 2 -> Solid 2
+    _      -> Empty
+
+data Creature = Enemy1 | Enemy2
+
+spawnCreature :: Creature -> V2 Int -> Map -> Map
+spawnCreature _ (V2 x y) = undefined 

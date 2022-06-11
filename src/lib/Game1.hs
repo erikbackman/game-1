@@ -20,7 +20,7 @@ import Game1.GameState
     gs_player,
     gs_running,
     initGameState,
-    parseMap, PlayerState (Walking), playerState, playerPos
+    parseMap,
   )
 import Game1.Input
   ( Intent (Idle, Move, Quit),
@@ -29,7 +29,7 @@ import Game1.Input
   )
 import Game1.Map (Map)
 import Game1.Player
-  ( move
+  ( move,
   )
 import Game1.Resources
   ( Resources (..),
@@ -55,10 +55,6 @@ main = do
           runGame1 r (initGameState m r) mainLoop
       SDL.quit
 
-newtype Game1 a
-  = Game1 (ReaderT Resources (StateT GameState IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadReader Resources, MonadState GameState, MonadIO)
-
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
@@ -66,11 +62,11 @@ loadMap :: MonadIO m => FilePath -> m (Maybe Map)
 loadMap = liftIO . (readFile >=> pure . parseMap)
 
 whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
-whileState cond act = do
+whileState cond action = do
   b <- use cond
   when b $ do
-    act
-    whileState cond act
+    action
+    whileState cond action
 
 update :: (MonadIO m, MonadState GameState m) => m ()
 update = do
@@ -97,6 +93,16 @@ mainLoop = do
     fstart <- Time.ticks
     update
     render
-
     ftime <- fmap (fstart -) Time.ticks
     when (fdelay > ftime) $ Time.delay (fdelay - ftime)
+
+newtype Game1 a
+  = Game1 (ReaderT Resources (StateT GameState IO) a)
+  deriving newtype
+    ( Functor,
+      Applicative,
+      Monad,
+      MonadReader Resources,
+      MonadState GameState,
+      MonadIO
+    )

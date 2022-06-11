@@ -9,7 +9,7 @@ license-file:       LICENSE
 build-type:         Simple
 extra-source-files:
   LICENSE
-Data-Files: assets/box.png
+Data-Files: axssets/box.png
 
 library
   hs-source-dirs: lib
@@ -34,7 +34,8 @@ library
     sdl2,
     sdl2-image,
     sdl2-ttf,
-    text
+    text,
+    containers
   default-language: Haskell2010
   ghc-options:
     -fwarn-unused-imports

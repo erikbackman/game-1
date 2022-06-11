@@ -39,6 +39,4 @@ inputToIntent evps =
                 _ -> mempty
               else mempty
           _ -> mempty
-   in if quit
-        then Quit
-        else if posDelta == V2 0 0 then Idle else Move posDelta
+   in if quit then Quit else if posDelta == V2 0 0 then Idle else Move posDelta
