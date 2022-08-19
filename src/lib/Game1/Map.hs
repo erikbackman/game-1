@@ -29,8 +29,3 @@ getTileType pos m =
     Just 3 -> Solid 3
     Just 2 -> Solid 2
     _      -> Empty
-
-data Creature = Enemy1 | Enemy2
-
-spawnCreature :: Creature -> V2 Int -> Map -> Map
-spawnCreature _ (V2 x y) = undefined 

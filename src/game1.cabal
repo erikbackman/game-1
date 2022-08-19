@@ -1,4 +1,4 @@
-cabal-version:      2.4
+cabal-version:      3.4
 
 name:               game1
 version:            0.1.0.0
@@ -26,7 +26,7 @@ library
   other-modules: Paths_game1
   build-depends:
     -- sdl2-gfx,
-    base,
+    base >=4.15.1.0,
     extra,
     lens,
     linear,
@@ -59,18 +59,8 @@ executable game1
   other-modules:
     Paths_game1
   build-depends:
-    base,
-    bytestring,
-    directory,
-    extra,
-    file-embed,
-    game1,
-    mtl,
-    paths,
-    sdl2,
-    sdl2-image,
-    text
-
+    base >=4.15.1.0,
+    game1
   hs-source-dirs: app
   default-language:    Haskell2010
   ghc-options:

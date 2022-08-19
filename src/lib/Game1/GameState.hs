@@ -7,7 +7,6 @@
 module Game1.GameState where
 
 import Control.Lens (makeLenses)
-import Control.Lens.Getter (use)
 import Control.Monad.RWS
 import Game1.Map (Map, tileToTexture)
 import Game1.Render
