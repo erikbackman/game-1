@@ -3,29 +3,33 @@ module Game1.Map where
 import Control.Monad.RWS
 import Foreign.C
 import Game1.Resources
-import SDL
+import SDL hiding (Unknown)
 import qualified Data.Map.Strict as SMap
 import Data.Map.Strict ((!?))
 
-type Map = SMap.Map (V2 Int) Int
+type Map a = SMap.Map (V2 Int) a
 
 data Tile = Tile
   { tileType :: TileType,
     tylePos :: V2 CInt
   }
 
-data TileType = Solid Int | Empty deriving (Eq, Show)
+data TileType = Solid Char | Empty | Unknown deriving (Eq, Show)
 
-tileToTexture :: MonadReader Resources m => Int -> m Texture
+tileToTexture :: MonadReader Resources m => Char -> m Texture
 tileToTexture t = useResources $ \r -> pure $
   fst $ case t of
-    2 -> tex_pillar r
-    3 -> tex_tile r
-    _ -> tex_tile r
+    '|' -> tex_pillar r
+    '#' -> tex_black r
+    '.' -> tex_tile r
+    '?' -> tex_black r
+    _   -> tex_tile r
 
-getTileType :: V2 Int -> Map -> TileType
+getTileType :: V2 Int -> Map Char -> TileType
 getTileType pos m =
   case m !? pos of -- TODO: use ix lenses!
-    Just 3 -> Solid 3
-    Just 2 -> Solid 2
-    _      -> Empty
+    Just '#' -> Solid '#'
+    Just '|' -> Solid '#'
+    Just '?' -> Unknown
+    Just '.' -> Empty
+    _        -> Empty

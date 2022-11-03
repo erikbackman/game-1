@@ -44,21 +44,15 @@ main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
   gameMap <- loadMap "assets/map.txt"
-
-  case gameMap of
-    Nothing -> SDL.quit
-    Just m -> do
-      withWindow
-        "Game1"
-        SDL.defaultWindow
-        \w -> withResources w \r ->
-          runGame1 r (initGameState m r) mainLoop
-      SDL.quit
+  withWindow "Game1" SDL.defaultWindow
+       \w -> withResources w \r ->
+            runGame1 r (initGameState gameMap r) mainLoop
+  SDL.quit
 
 runGame1 :: Resources -> GameState -> Game1 a -> IO a
 runGame1 r s (Game1 m) = evalStateT (runReaderT m r) s
 
-loadMap :: MonadIO m => FilePath -> m (Maybe Map)
+loadMap :: MonadIO m => FilePath -> m (Map Char)
 loadMap = liftIO . (readFile >=> pure . parseMap)
 
 whileState :: Monad m => MonadState s m => Lens' s Bool -> m () -> m ()
@@ -68,7 +62,7 @@ whileState cond action = do
     action
     whileState cond action
 
-update :: (MonadIO m, MonadState GameState m) => m ()
+update :: Game1 ()
 update = do
   input <- pollEventPayloads
   case inputToIntent input of
@@ -78,21 +72,20 @@ update = do
       m <- use gs_map
       gs_player %= move m dir_vec
 
-render :: (MonadIO m, MonadState GameState m, MonadReader Resources m) => m ()
-render = do
-  r <- asks sdl_renderer
+render :: SDL.Renderer -> Game1 ()
+render r = do
   SDL.clear r
   drawScene
   SDL.present r
 
-mainLoop ::
-  (MonadIO m, MonadReader Resources m, MonadState GameState m) => m ()
+mainLoop :: Game1 ()
 mainLoop = do
   let fdelay = 1000 `div` 60
+  r <- asks sdl_renderer
   whileState gs_running $ do
     fstart <- Time.ticks
     update
-    render
+    render r
     ftime <- fmap (fstart -) Time.ticks
     when (fdelay > ftime) $ Time.delay (fdelay - ftime)
 

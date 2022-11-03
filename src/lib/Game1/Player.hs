@@ -12,7 +12,7 @@ import Linear
 orientation :: V2 Int -> V2 Bool
 orientation (V2 v1 v2) = V2 ((< 0) v1) False
 
-move :: Map -> V2 Int -> Player -> Player
+move :: Map Char -> V2 Int -> Player -> Player
 move m dirv@(V2 d1 d2) p@(Player posv@(V2 p1 p2) speed curr_dirv _) =
   let -- Only care to update dirv when d1 != 0 since
       -- I don't have any sprites for back and front atm.

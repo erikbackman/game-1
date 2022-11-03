@@ -14,6 +14,7 @@ data Resources = Resources
     tex_tile :: (SDL.Texture, SDL.TextureInfo),
     tex_pillar :: (SDL.Texture, SDL.TextureInfo),
     tex_heart :: (SDL.Texture, SDL.TextureInfo),
+    tex_black :: (SDL.Texture, SDL.TextureInfo),
     sdl_renderer :: SDL.Renderer
   }
 
@@ -27,6 +28,7 @@ loadResources window = do
   tex_tile <- loadAsset "tile.png"
   tex_pillar <- loadAsset "pillar.png"
   tex_heart <- loadAsset "heart.png"
+  tex_black <- loadAsset "black.png"
   pure $ Resources {..}
   where
     loadTexture renderer path = SDL.Image.loadTexture renderer path

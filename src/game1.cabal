@@ -27,6 +27,7 @@ library
   build-depends:
     -- sdl2-gfx,
     base >=4.15.1.0,
+    directory >= 1.3.6.2,
     extra,
     lens,
     linear,
@@ -35,7 +36,7 @@ library
     sdl2-image,
     sdl2-ttf,
     text,
-    containers
+    containers,
   default-language: Haskell2010
   ghc-options:
     -fwarn-unused-imports
@@ -59,8 +60,10 @@ executable game1
   other-modules:
     Paths_game1
   build-depends:
-    base >=4.15.1.0,
-    game1
+    base >= 4.15.1.0,
+    directory >= 1.3.6.2,
+    game1,
+    text >= 1.2.5.0
   hs-source-dirs: app
   default-language:    Haskell2010
   ghc-options:

@@ -7,14 +7,13 @@ import Linear (M22, (!*))
 import SDL (V2 (V2))
 import qualified SDL
 
-renderTextureWithRot ::
-  (MonadIO m, MonadReader Resources m, Integral a)
+renderTextureWithRot :: (MonadIO m, MonadReader Resources m, Integral a)
   => V2 a -> V2 Bool -> SDL.Texture -> m ()
 renderTextureWithRot posv rot tex = do
-  ti <- SDL.queryTexture tex
+  tex_info <- SDL.queryTexture tex
   renderer <- asks sdl_renderer
   
-  let tsize  = V2 (SDL.textureWidth ti) (SDL.textureHeight ti)
+  let tsize  = V2 (SDL.textureWidth tex_info) (SDL.textureHeight tex_info)
       tposv  = renderBasis !* (toCInt <$> posv)
       src    = Nothing
       dest   = Just $ SDL.Rectangle (SDL.P tposv) tsize
